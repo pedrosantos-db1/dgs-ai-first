@@ -1,0 +1,67 @@
+{
+  "mcpServers": {
+    "filesystem-rw": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "./src",
+        "./specs",
+        "./skills",
+        "./prompts",
+        "./tests",
+        "./docs/adr"
+      ],
+      "description": "Read-write access to code, specs, skills, prompts, tests and ADRs. Excludes business documentation and retrieval corpus."
+    },
+    "filesystem-docs": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "./docs/novatech"
+      ],
+      "env": {
+        "READONLY": "true"
+      },
+      "description": "Read-only access to NovaTech business documentation. Source of truth — no writes allowed."
+    },
+    "filesystem-corpus": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "./data/retrieval-corpus"
+      ],
+      "env": {
+        "READONLY": "true"
+      },
+      "description": "Read-only access to RAG retrieval corpus chunks. Used to simulate Azure AI Search locally."
+    },
+    "git": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-git",
+        "--repository",
+        "."
+      ],
+      "description": "Git history, diff and branch inspection. Local repository only — no remote push operations."
+    },
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "description": "Persistent knowledge graph for domain decisions, ubiquitous language and architectural choices."
+    },
+    "everything": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-everything"
+      ],
+      "description": "MCP primitives exploration only. No project data access."
+    }
+  }
+}
