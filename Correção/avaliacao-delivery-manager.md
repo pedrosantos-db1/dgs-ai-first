@@ -1,49 +1,36 @@
-# Skill de Avaliação — Delivery Manager (Cenário 2)
+# Skill de Avaliação — Delivery Manager (Cenário 3)
 
 > **Programa:** Trilha de Certificação AI First — DGS / DB1 Global Software
-> **Escopo:** Cenário-Âncora 2 — Fase de Estruturação do Trabalho (exercícios 2.1, 2.2, 2.3)
+> **Escopo:** Cenário-Âncora 3 — Fase de Governança e Validação (exercícios 3.1 e 3.2)
 > **Referência:** Usar com `avaliacao-foundation.md` para dimensões e escala.
 
-**Perfil:** Define como o time trabalha no modelo AI First — workflow, governance de specs, e regras de gestão consumíveis por agentes.
+**Perfil:** Define critérios de go-live e observabilidade. Demonstra que entende o harness como sistema de governança e que sabe traduzir confiabilidade técnica em decisões de gestão.
 
-**Ferramentas esperadas:** Claude (chat) em todos; Claude Cowork nos exercícios 2.1 e 2.2.
-
----
-
-## Exercício 2.1 — Workflow de desenvolvimento AI First
-
-**Tópicos avaliados:** MCP (quais ferramentas cada papel usa), SDD (fluxo Spec→Plan→Tasks).
-
-| Critério | Score 3 | Red flag (≤ 1) |
-|----------|---------|-----------------|
-| Ferramentas diferenciadas por papel | Copilot para devs, Cowork para gestão, Design para produto — não mistura | Todos usam tudo sem distinção |
-| Validation gates específicos | Cada gate: quem aprova, o que verifica, critério de aprovação concreto | "Revisar antes de continuar" |
-| Equilíbrio velocidade/segurança | Gates proporcionais ao risco (merge na main > draft de spec) | Sem gates, ou gates em tudo |
-| Checklist (Cowork) executável | Qualquer membro do time sabe o que fazer ao chegar num gate | Lista genérica |
+**Ferramentas esperadas:** Claude (chat) + Claude Cowork em ambos.
 
 ---
 
-## Exercício 2.2 — Governança de specs no modelo SDD
+## Exercício 3.1 — Critérios de go-live com harness de governança
 
-**Tópicos avaliados:** SDD (specs como contratos executáveis), AGENTS.md (governança de artefatos).
+**Tópico:** Harness Engineering
 
 | Critério | Score 3 | Red flag (≤ 1) |
 |----------|---------|-----------------|
-| Specs como artefatos vivos | Processo com ciclo de vida (rascunho → revisão → aprovação → implementação → validação) | Specs escritas uma vez e esquecidas |
-| Atribuição coerente por papel | PS → requirements, TL → plan, Dev → tasks | Todos fazem tudo, ou um faz tudo |
-| Change management explícito | O que acontece se spec muda após início de implementação: quem aprova, como afeta tasks | Sem menção a mudanças |
-| Board de tracking (Cowork) prático | 5 módulos com status visual, filtráveis, com responsável | Tabela estática |
-| Referencia Anexo C | Specs seguem a estrutura de diretórios do repositório | Estrutura inventada inconsistente com Anexo C |
+| Organizado pelas 5 camadas | Cada camada (orchestration, verification, context, guardrails, observability) tem critério específico | Lista genérica sem organização por camada |
+| Bloqueante vs desejável | Distinção pragmática (ex: "coverage 75% bloqueante, 80% desejável") | Tudo bloqueante, ou tudo desejável |
+| Ponto de HITL concreto | Define quais decisões exigem humano (ex: baixa confiança sobre carga perigosa) | "Ter supervisão humana" sem especificar |
+| Dashboard (Cowork) | Verde/amarelo/vermelho, responsável, data-alvo | Tabela sem status visual |
+| Plano de rollback | Trigger + responsável + ação | "Avaliar a situação" |
 
 ---
 
-## Exercício 2.3 — Seção "Project Management Rules" do AGENTS.md
+## Exercício 3.2 — Plano de observabilidade e melhoria contínua
 
-**Tópicos avaliados:** AGENTS.md (machine-readable), SDD (nomenclatura e rastreabilidade).
+**Tópico:** Revisão Crítica (aplicada a monitoramento)
 
 | Critério | Score 3 | Red flag (≤ 1) |
 |----------|---------|-----------------|
-| Machine-readable | Regras prescritivas (DEVE/NÃO DEVE), parseáveis por agente | Texto narrativo, descritivo |
-| Específico ao NovaTech | Referencia caminhos do repo (`/docs/adr/`), módulos do projeto | Genérico para qualquer projeto |
-| Consistente com gates fornecidos | Validation gates do input simulado refletidos no AGENTS.md | Contradiz ou ignora os gates |
-| Regras de nomenclatura concretas | Formato de título, labels obrigatórias, convenção de commit | "Nomear de forma clara" |
+| 4 dimensões de métricas | Uso, qualidade, técnicas, conteúdo — todas presentes | Apenas técnicas (latência, uptime) |
+| Alertas com thresholds | "Se feedback negativo > 15% em 24h, notificar" | "Monitorar se piora" |
+| Feedback loop completo | Do atendente → investigação → correção no assistente | Feedback coletado sem ação definida |
+| Template de relatório (Cowork) | Executivo entende em 2 min, mostra tendência (melhorou/piorou) | Relatório técnico denso ou ausente |

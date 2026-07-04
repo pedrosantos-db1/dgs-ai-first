@@ -1,56 +1,39 @@
-# Skill de Avaliação — Tech Lead (Cenário 2)
+# Skill de Avaliação — Tech Lead (Cenário 3)
 
 > **Programa:** Trilha de Certificação AI First — DGS / DB1 Global Software
-> **Escopo:** Cenário-Âncora 2 — Fase de Estruturação do Trabalho (exercícios 2.1, 2.2, 2.3)
+> **Escopo:** Cenário-Âncora 3 — Fase de Governança e Validação (exercícios 3.1 e 3.2)
 > **Referência:** Usar com `avaliacao-foundation.md` para dimensões e escala.
 
-**Perfil:** Monta o AGENTS.md, define a arquitetura de MCP, e cria skills técnicas. Testa artefatos com Copilot e itera com base em resultados reais. Demonstra que artefatos para agentes precisam de refinamento empírico, não apenas autoria teórica.
+**Perfil:** Projeta o harness do projeto e revisa riscos de artefatos gerados por IA. Demonstra visão de sistema (5 camadas) e julgamento sobre o que é seguro levar a produção.
 
-**Ferramentas esperadas:** Claude (chat) em todos; GitHub Copilot em todos (2.1, 2.2, 2.3).
-
----
-
-## Exercício 2.1 — Construção e teste do AGENTS.md
-
-**Tópicos avaliados:** AGENTS.md (constitution do projeto), Skills (testar se agentes seguem), Engenharia de Contexto (regras de context budget do cenário 1).
-
-**Exercício com ciclo obrigatório de teste real com Copilot. Se não há evidência de teste → D2 ≤ 1.**
-
-| Critério | Score 3 | Red flag (≤ 1) |
-|----------|---------|-----------------|
-| Prescritivo, não descritivo | "DEVE usar Zod para validação" vs "usamos Zod" | Texto narrativo |
-| Inclui regras de context budget | ADR-0002 materializada: "~4K tokens system + ~8K chunks por query" | Sem menção a gerenciamento de contexto |
-| Teste real com Copilot | Evidência: output do Copilot (endpoint + teste). Análise do que seguiu/ignorou | Sem evidência |
-| Iteração v1 → v2 | Seções reescritas, Copilot gera output mais aderente com v2 | V1 = V2 |
-| Reconhece limitações | Nem tudo será seguido — documentado honestamente | "AGENTS.md resolve tudo" |
-| Referencia ADRs do cenário 1 | Decisões técnicas (TypeScript strict, Zod, Vitest, pino) derivadas das ADRs | Decisões inventadas sem rastreabilidade |
+**Ferramentas esperadas:** Claude (chat) em ambos; GitHub Copilot no 3.1.
 
 ---
 
-## Exercício 2.2 — Arquitetura de MCP
+## Exercício 3.1 — Design do harness do projeto
 
-**Tópicos avaliados:** MCP (servers como infraestrutura gerenciada), Harness (monitoramento — preview).
+**Tópico:** Harness Engineering
 
 | Critério | Score 3 | Red flag (≤ 1) |
 |----------|---------|-----------------|
-| MCP como infraestrutura | Versionamento, monitoramento, política de aprovação para novos servers | Configuração ad-hoc |
-| Diagrama de conexões | Quem consome o quê, com permissões | Sem diagrama |
-| Script de health check executado | Lê o `.mcp/mcp.json`, sobe/consulta cada server local e reporta status, com saída de execução real. Gerado com Copilot | Sem script, não-funcional, ou sem saída de execução |
-| Plano de contingência realista | Agente degradado (capacidade reduzida) > agente quebrado (para tudo) | "Se cair, para tudo" |
-| Política de aprovação equilibrada | Agilidade com segurança: não burocratiza demais, não libera tudo | Extremos: burocracia ou nenhum controle |
+| 5 camadas cobertas | Orchestration, verification, context & memory, guardrails, observability — cada uma com o que tem / falta / como fechar | Falta mais de 1 camada |
+| Context & memory conecta à ADR-0002 | Reconhece o context budget definido no cenário 1, não reinventa | Reinventa a estratégia de contexto |
+| Guardrails mencionam structured outputs + HITL | Indica onde structured output entra e ao menos 1 ponto de HITL | Sem menção a structured output ou HITL |
+| Função de verificação implementada | Checa se source_document está na lista de docs válidos (identificadores curtos: POL-001, etc.). Funcional, com Copilot | Apenas descrita, não implementada |
+| Concretude | Prescreve implementações, não descreve conceitos | "Adicionar verificações" sem dizer quais |
+
+**Nota de calibração:** A versão reduzida pede UMA verificação simples (fonte na lista), não o verification loop completo. Não penalizar por não implementar schema + lookup table + confidence score + roteamento HITL.
 
 ---
 
-## Exercício 2.3 — Criação e teste de skills técnicas
+## Exercício 3.2 — Revisão crítica da arquitetura gerada com IA
 
-**Tópicos avaliados:** Skills (autoria, teste empírico, maturidade), AGENTS.md (skills como extensão).
-
-**Exercício com ciclo obrigatório de teste com Copilot. Se não há evidência → D2 ≤ 1.**
+**Tópico:** Revisão Crítica de Outputs de IA
 
 | Critério | Score 3 | Red flag (≤ 1) |
 |----------|---------|-----------------|
-| SKILL.md com código real | Exemplos TypeScript de DO/DON'T para Azure Functions endpoint. Anti-padrões com explicação | Texto abstrato sem código |
-| Teste real com Copilot | Gerou endpoint com skill presente. Documentou seguido/ignorado | Sem teste real |
-| Iteração documentada | Seções reescritas após teste. Output do Copilot melhorou | Sem iteração |
-| Critérios de maturidade práticos | "Testada com 3+ gerações, anti-padrões validados, aprovada em review" | "Quando parecer boa" |
-| Skills são artefatos vivos | Participante demonstra que skill precisa de refinamento contínuo | Skill escrita uma vez como definitiva |
+| Skills sem refinamento = risco | Identifica que as 2 skills não testadas podem gerar outputs inconsistentes | Não identifica |
+| Prompt sem changelog = risco de governança | 6 iterações sem documentação = impossível rollback informado | Não identifica |
+| Análise própria ANTES do Claude | Avaliação de riscos independente, por artefato | Análise vazia |
+| Priorização pragmática | Foca nas verificações de maior impacto nas 2 semanas; aceita risco residual explícito | Quer verificar tudo, ou não prioriza |
+| Comparação com Claude honesta | Reconhece riscos adicionais que o Claude levantou | "Já sabia tudo" |

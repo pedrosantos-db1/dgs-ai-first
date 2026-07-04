@@ -1,52 +1,48 @@
-# Skill de Avaliação — Desenvolvedor (Cenário 2)
+# Skill de Avaliação — Desenvolvedor (Cenário 3)
 
 > **Programa:** Trilha de Certificação AI First — DGS / DB1 Global Software
-> **Escopo:** Cenário-Âncora 2 — Fase de Estruturação do Trabalho (exercícios 2.1, 2.2, 2.3)
+> **Escopo:** Cenário-Âncora 3 — Fase de Governança e Validação (exercícios 3.1 e 3.2)
 > **Referência:** Usar com `avaliacao-foundation.md` para dimensões e escala.
 
-**Perfil:** Configura a infraestrutura de agentes (MCP), implementa specs com SDD, e define a estratégia de skills. Usa Copilot como ferramenta de implementação mantendo julgamento próprio.
+**Perfil:** Implementa structured outputs e verificações determinísticas (harness de código), e revisa código gerado por IA. Demonstra que sabe transformar guardrails de produto em código que realmente bloqueia respostas ruins.
 
-**Ferramentas esperadas:** Claude (chat) em todos; GitHub Copilot nos exercícios 2.1 (agente com os MCP servers ativos), 2.2 e 2.3.
-
----
-
-## Exercício 2.1 — Configuração de MCP servers
-
-**Tópicos avaliados:** MCP (servers, tools, resources, permissões).
-
-| Critério | Score 3 | Red flag (≤ 1) |
-|----------|---------|-----------------|
-| Mapeamento necessidade → server local | Cada necessidade (código/specs/skills, docs de negócio, corpus de retrieval, histórico, memória) mapeada a um *reference server* local e gratuito (filesystem, git, memory, everything), com tools/resources e escopo | Usa servers pagos/externos (Azure, Confluence, GitHub remoto); < 3 servers; ou sem distinção tools/resources |
-| Least privilege concreto | filesystem com escopo mínimo de pastas; `docs/novatech/` e `data/retrieval-corpus/` como read-only; justificativa por server | Escopo amplo demais; fontes de negócio com escrita; sem justificativa |
-| Evidência de uso real | Servers no ar: o agente lê um doc de `docs/novatech/`, recupera um chunk de `data/retrieval-corpus/` (coerente com o mapa do Anexo B) e lê o histórico via git | Só o arquivo de config, sem evidência de execução |
-| Riscos de segurança do setup local | Ex: filesystem com escopo amplo expõe `.env`/segredos; server com escrita deixa o agente alterar arquivos sem revisão | "Alguém pode hackear" |
-| `.mcp/mcp.json` válido e coerente | Sintaticamente correto, coerente com o mapeamento/escopos, partindo do exemplo do Anexo C | Ausente, com erros, ou inconsistente com o mapeamento |
+**Ferramentas esperadas:** Claude (chat) + GitHub Copilot em ambos.
 
 ---
 
-## Exercício 2.2 — Implementação com SDD (plan → tasks → código)
+## Exercício 3.1 — Structured output e verificações determinísticas
 
-**Tópicos avaliados:** SDD (decomposição em tasks atômicas), Skills (padrões de código).
+**Tópico:** Harness Engineering
 
 | Critério | Score 3 | Red flag (≤ 1) |
 |----------|---------|-----------------|
-| Tasks atômicas | Cada task implementável e testável isoladamente. ID, dependências, critérios de aceite | Tasks grandes e interdependentes |
-| Critérios de aceite verificáveis | "Endpoint retorna 400 para body sem campo question" | "Endpoint funciona" |
-| Código segue padrões do plan | TypeScript, Zod, Azure Functions v4, pino, conforme definido | JavaScript, sem validação, console.log |
-| Código segue Anexo C | Arquivo no path correto (`/src/functions/query/`) | Path inventado |
-| Revisão crítica real | 2+ problemas reais no código do Copilot (não inventados) | Problemas cosméticos inventados |
-| Conecta com cenário 1 | Reconhece que protótipo open-source (Dev 1.3) validou a abordagem; agora é produção | Ignora o trabalho anterior |
+| Schema de structured output | Schema Zod válido com campos obrigatórios (answer, source_document, confidence_score), tipos corretos | Schema ausente, ou sem validação Zod |
+| Guardrail 1 (source_document) | Bloqueia de fato respostas sem fonte e retorna mensagem padrão | Apenas loga, não bloqueia |
+| Guardrail 2 (carga perigosa + devolução) | Detecta a combinação e bloqueia se não houver negativa | Não implementado ou trivialmente burlável |
+| Code review com Claude | Identifica 2+ problemas reais (ex: schema aceita campos extras, regex não cobre variações) e corrige | Problemas inventados, ou sem correção |
+| Probabilístico vs determinístico | Demonstra que structured output + código (determinístico) complementam o prompt (probabilístico) | Confunde os conceitos |
+
+**Nota de calibração:** A versão reduzida pede 2 guardrails (não 4) e code review "rápido". Não penalizar por não implementar lookup table de valores numéricos — isso não foi pedido.
 
 ---
 
-## Exercício 2.3 — Estratégia de skills do projeto
+## Exercício 3.2 — Revisão crítica de código gerado por IA
 
-**Tópicos avaliados:** Skills (hierarquia Foundation → Domain → Artifact), AGENTS.md (como skills se conectam).
+**Tópico:** Revisão Crítica de Outputs de IA
+
+### Armadilhas obrigatórias no código simulado
+
+| Violação | Tipo | Se não identificou |
+|----------|------|--------------------|
+| `as any` sem validação Zod | Violação AGENTS.md | D4 ≤ 2 |
+| `console.log` em vez de pino | Violação AGENTS.md | D4 ≤ 2 |
+| `require` dinâmico | Violação AGENTS.md | D4 ≤ 2 |
+| `attendantEmail` (dado pessoal) logado | Problema de segurança | D4 ≤ 1 se não identificou |
+
+**Para score 3 em D4:** identificar os 4 problemas na análise própria (antes do Claude).
 
 | Critério | Score 3 | Red flag (≤ 1) |
 |----------|---------|-----------------|
-| Árvore coerente com projeto | Skills que o projeto realmente usaria (RAG endpoint, integration test, React card) | Skills teóricas que ninguém consumiria |
-| Criação/consumo multi-papel | PS cria skill de spec, QA cria skill de teste, não é só para devs | Tudo criado e consumido por devs |
-| SKILL.md Foundation concreto | Exemplos de código TypeScript reais (DO/DON'T), anti-padrões que Copilot geraria | Texto abstrato sem código |
-| Anti-padrões úteis | Coisas que LLMs realmente geram errado: `as any`, `console.log`, require dinâmico | Anti-padrões genéricos |
-| Referencia Anexo C | Skills na hierarquia `/skills/foundation/`, `/skills/domain/`, `/skills/artifact/` | Estrutura inventada |
+| Análise própria ANTES do Claude | Identifica a maioria dos problemas independentemente | Análise própria vazia |
+| Comparação humano vs Claude | Honesta sobre o que cada um encontrou | "Concordamos em tudo" |
+| Código reescrito | Segue o AGENTS.md integralmente (Zod, pino, import estático, sem logar e-mail) | Reescrita ainda com violações |
